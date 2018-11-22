@@ -1,0 +1,14 @@
+{
+  "name": "data-mocker",
+  "version": "1.0.0",
+  "description": "creating mock data from minimal info provided",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "Tulaib",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.18.6"
+  }
+}
