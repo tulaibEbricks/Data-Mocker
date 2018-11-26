@@ -1,10 +1,7 @@
 const mocker = require('mocker-data-generator').default
 const util = require('util');
-var csv = require("fast-csv");
-var fs  = require('fs');
 
-var csvStream = csv.format({headers: true}); 
-var writableStream = fs.createWriteStream("my.csv");
+const csvHandler = require('./Components/CSVHandler')
 
 var user = {
     firstName: {
@@ -62,23 +59,10 @@ mocker()
     .build()
     .then(
         data => {
-            
- 
-            writableStream.on("finish", () => {
-                console.log("DONE!");
-            });
-
-            csvStream.pipe(writableStream);
             // console.log(util.inspect(data, { depth: 10 }));
             const userList = data['user'];
             console.log(userList.length);
-            var i;
-            for (i = 0; i < userList.length; i++) {
-                const user = userList[i];
-                csvStream.write({FirstName: user['firstName'], LastName: user['lastName'], 
-                    Country: user['country'], CreatedAt: user['createdAt'], Username: user['username']});
-            }
-            csvStream.end();
+            csvHandler.writeData(userList)
         },
         err => console.error(err)
     )
