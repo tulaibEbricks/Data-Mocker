@@ -10,5 +10,9 @@
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^1.18.6"
+  },
+  "dependencies": {
+    "fast-csv": "^2.4.1",
+    "mocker-data-generator": "^2.6.6"
   }
 }
