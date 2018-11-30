@@ -21,7 +21,7 @@ const writeData = (dataList) => {
     csvStream.end();
 }
 
-const readData = () => {
+const readData = () => { 
     var readStream = fs.createReadStream(filepath);
  
     csv

@@ -2,38 +2,22 @@ const mocker = require('mocker-data-generator').default
 const util = require('util');
 
 const csvHandler = require('./Components/CSVHandler')
+const webpageGrabber = require('./Components/webpageGrabber')
+const webSourceWriter = require('./Components/WebSourceWriter')
 
-function mockData() {
+const websiteURL = 'https://www.linkedin.com/'
+const htmlFileName = 'websitePageSource.html';
+const htmlFilePath = '../' + htmlFileName;
+
+async function mockData() {
+    const htmlString = await webpageGrabber.setupPage(websiteURL);
+    webSourceWriter.writeHTMLToFile(htmlString, htmlFilePath);
+    await webpageGrabber.closeBrowser();
     // createMockData()
-    readMockData()
+    // readMockData()
 }
 
 mockData()
-// var group = {
-//     description: {
-//         faker: 'lorem.paragraph'
-//     },
-//     users: [
-//         {
-//             function: function() {
-//                 return this.faker.random.arrayElement(this.db.user).username
-//             },
-//             length: 10,
-//             fixedLength: false
-//         }
-//     ]
-// }
-// var conditionalField = {
-//     type: {
-//         values: ['HOUSE', 'CAR', 'MOTORBIKE']
-//     },
-//     'object.type=="HOUSE",location': {
-//         faker: 'address.city'
-//     },
-//     'object.type=="CAR"||object.type=="MOTORBIKE",speed': {
-//         faker: 'random.number'
-//     }
-// }
 
 function readMockData() {
     csvHandler.readData();

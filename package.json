@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "fast-csv": "^2.4.1",
-    "mocker-data-generator": "^2.6.6"
+    "mocker-data-generator": "^2.6.6",
+    "puppeteer": "^1.10.0",
+    "write": "^1.0.3"
   }
 }
