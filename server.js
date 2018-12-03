@@ -1,27 +1,36 @@
 const mocker = require('mocker-data-generator').default
 const util = require('util');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 const csvHandler = require('./Components/CSVHandler')
 const webpageGrabber = require('./Components/webpageGrabber')
 const webSourceWriter = require('./Components/WebSourceWriter')
 
+const app = express();
+app.use(bodyParser.json());
 const websiteURL = 'https://www.linkedin.com/'
 const htmlFileName = 'websitePageSource.html';
 const htmlFilePath = '../' + htmlFileName;
 
 async function mockData() {
+    // createMockData()
     const htmlString = await webpageGrabber.setupPage(websiteURL);
     webSourceWriter.writeHTMLToFile(htmlString, htmlFilePath);
     await webpageGrabber.closeBrowser();
-    // createMockData()
-    // readMockData()
 }
 
-mockData()
+app.get('/', async (req, res) => {
+    const htmlString = await webpageGrabber.setupPage(websiteURL);
+    res.send(htmlString);
+})
 
-function readMockData() {
-    csvHandler.readData();
-}
+app.get('/readMockData', async (req, res) => {
+    console.log('Get call made!!')
+    const dataList = await csvHandler.readData();
+    console.log('DATA', dataList);
+    res.send(dataList);
+})
 
 function createMockData() {
     var user = {
@@ -31,27 +40,16 @@ function createMockData() {
         lastName: {
             faker: 'name.lastName'
         },
-        country: {
-            faker: 'address.country'
+        email: {
+            faker: 'internet.email'
         },
-        createdAt: {
-            faker: 'date.past'
-        },
-        username: {
-            function: function() {
-                return (
-                    this.object.lastName.substring(0, 5) +
-                    this.object.firstName.substring(0, 3) +
-                    Math.floor(Math.random() * 10)
-                )
-            }
+        password: {
+            faker: 'internet.password'
         }
     }
 
     mocker()
     .schema('user', user, 5)
-    // .schema('group', group, 5)
-    // .schema('conditionalField', conditionalField, 5)
     .build()
     .then(
         data => {
@@ -62,3 +60,7 @@ function createMockData() {
         err => console.error(err)
     )
 }
+
+app.listen(3000, () => {
+    console.log('app is running on port 3000')
+})

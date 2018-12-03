@@ -7,28 +7,9 @@ var browser;
 const setupPage = async (webpageURL) => {
     browser = await puppeteer.launch();
     page = await browser.newPage();
-    // await page.setJavaScriptEnabled(false);
     await page.goto(webpageURL);
-    // await page.exposeFunction('alert', (e) => { console.log("Received " + e); });
-    await page.addScriptTag({ path: './Components/CodeInjector.js' });
-    await page.addStyleTag({ path: './Components/CodeInjector.css' });
-    // const { script, HTMLWithoutScript } = await page.evaluate(() => {
-    //     console.log('Hello  !!!')
-    //     const script = ''
-    //     const HTMLWithoutScript = ''
-    //     // const script = document.querySelector('script').innerHTML;
-    //     // document.querySelector('script').innerHTML = '';
-    //     // const HTMLWithoutScript = document.body.innerHTML;
-    //     return { script, HTMLWithoutScript }
-    // });
-    // const script = await page.evaluate(() => {
-    //     const script = document.querySelector('script');
-    //     return script;
-    //   });
-    //   console.log(script);
-    // await page.setJavaScriptEnabled(true);
-    // await page.goto(`data:text/html,${HTMLWithoutScript}`);
-    // await page.addScriptTag({ content: script });
+    await page.addScriptTag({ path: './Public/CodeInjector.js' });
+    await page.addStyleTag({ path: './Public/CodeInjector.css' });
     const html = await page.content();
     return html;
 }
