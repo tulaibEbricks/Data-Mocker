@@ -5,7 +5,21 @@ getCSVData();
 
 function buttonTapped() {
    console.log('Button tapped');
+   var modal = document.getElementById('myModal');
+   modal.style.display = "none";
 }
+
+function checkboxTapped(checkbox) {
+    console.log('Checkbox tapped with id:', checkbox.id);
+ }
+
+ function dropDownValueSelected(dropDown) {
+    console.log('Selected Value:', dropDown.value);
+ }
+
+ function doneButtonTapped(dropDown) {
+    console.log('Done Button Tapped');
+ }
 
 function getCSVData() {
     var xmlhttp = new XMLHttpRequest();
@@ -35,7 +49,6 @@ function getInputElements() {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE) {
            if (xmlhttp.status == 200) {
-            console.log('xmlhttp.responseText');
                inputElements = JSON.parse(xmlhttp.responseText);
                makeHTML();
            }
@@ -58,6 +71,7 @@ function makeHTML() {
         <!-- Modal content -->
         <div class="modal-content">
             <span class="close" onclick="buttonTapped();">&times;</span>
+            <h3>Select form fields that you want to be filled along with desired mappings</h3>
             <table id="csvData">
                 <tr>
                     <th>Selected Fields</th>
@@ -68,12 +82,12 @@ function makeHTML() {
                 `;
     
     for (var i = 0; i < inputElements.length; i++) {
-        injectableHtml += `<td><input type="checkbox"/></td>`
         const inputElementDict = inputElements[i];
+        injectableHtml += `<td><input type="checkbox" id="`+ inputElementDict['name'] + `" onchange="checkboxTapped(this);"/></td>`
         injectableHtml += `<td>` + inputElementDict['name'] + `</td>`;
         injectableHtml += `
             <td>
-                <select>`;
+                <select onchange="dropDownValueSelected(this);">`;
         for (var j = 0; j < csvData[0].length; j++) {
             injectableHtml += `<option value="` + csvData[0][j] + `">` + csvData[0][j] +  `</option>`
         }
@@ -84,6 +98,7 @@ function makeHTML() {
     }
     injectableHtml += `
                 </table>
+                <button type="button" onclick="doneButtonTapped();">DONE!</button>
             </div>
         </div>
         `;
