@@ -1,8 +1,9 @@
 const puppeteer = require('puppeteer');
 
-const interactiveElementTags = ['a', 'button', 'input'];
+const inputElementTag = 'input';
 var page;
 var browser;
+var elementPropertyList;
 
 const setupPage = async (webpageURL) => {
     browser = await puppeteer.launch();
@@ -11,26 +12,21 @@ const setupPage = async (webpageURL) => {
     await page.addScriptTag({ path: './Public/CodeInjector.js' });
     await page.addStyleTag({ path: './Public/CodeInjector.css' });
     const html = await page.content();
+    await parseInputElements();
     return html;
-}
-
-const grabPageData = async () => {
-    const elementsDictionary = await getInteractiveElements();
-    return elementsDictionary;
 }
 
 const closeBrowser = async () => {
     await browser.close();
 }
 
-async function getInteractiveElements() {
-    const elementsDictionary = {};
-    for (const tag of interactiveElementTags) {
-        const interactableElements = await page.$$(tag);
-        const elementsPropertyList = await elementsIterator(interactableElements)
-        elementsDictionary[tag] = elementsPropertyList
-    }
-    return elementsDictionary;
+const getInputElements = () => {
+    return elementPropertyList;
+}
+
+async function parseInputElements() {
+    const interactableElements = await page.$$(inputElementTag);
+    elementPropertyList = await elementsIterator(interactableElements);
 }
 
 async function elementsIterator(elements) {
@@ -50,51 +46,15 @@ async function loadElementProperties(item) {
         if (tagName !== "") 
             propertyDict['tagName'] = tagName
         
-        const value = await ( await element.getProperty( 'value' ) ).jsonValue();
+        const value = await ( await element.getProperty( 'name' ) ).jsonValue();
         if (value !== "") 
-            propertyDict['value'] = value
-
-        const title = await ( await element.getProperty( 'title' ) ).jsonValue();
-        if (title !== "") 
-            propertyDict['title'] = title
-
-        const text = await ( await element.getProperty( 'text' ) ).jsonValue();
-        if (text !== "") 
-            propertyDict['text'] = text
-        const link = await ( await element.getProperty( 'href' ) ).jsonValue();
-        if (link !== "") 
-            propertyDict['link'] = link
-        const style = await ( await element.getProperty( 'style' ) ).jsonValue();
-        const isEmpty = checkIfJSONIsEmpty(style)
-        if (!isEmpty) {
-            propertyDict['style'] = style
-            // const nodeList = await getStyleValue(element, style);
-            // console.log(nodeList);
-        }
-        const dimensions = await element.boundingBox()
-        if (dimensions !== null)
-            propertyDict['dimensions'] = dimensions
+            propertyDict['name'] = value
     }
     return propertyDict;
 }
 
-function checkIfJSONIsEmpty(json) {
-    for(var key in json) {
-        if(json.hasOwnProperty(key))
-            return false;
-    }
-    return true;
-}
-
-function calculateScreenshotHeight(websiteHeight, screenMaxHeight) {
-    if (websiteHeight > screenMaxHeight) {
-        return screenMaxHeight;
-    }
-    return websiteHeight;
-}
-
 module.exports = {
     setupPage,
-    grabPageData,
+    getInputElements,
     closeBrowser
 }

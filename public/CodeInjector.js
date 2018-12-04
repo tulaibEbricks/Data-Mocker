@@ -1,30 +1,6 @@
-function injectHTML() {
-    document.body.innerHTML += `<!-- The Modal -->
-        <div id="myModal" class="modal">
-            <!-- Modal content -->
-            <div class="modal-content">
-                <span class="close" onclick="buttonTapped();">&times;</span>
-                <table id="csvData">
-                    <tr>
-                        <th>Firstname</th>
-                        <th>Lastname</th> 
-                        <th>Age</th>
-                    </tr>
-                    <tr>
-                        <td>Jill</td>
-                        <td>Smith</td> 
-                        <td>50</td>
-                    </tr>
-                    <tr>
-                        <td>Eve</td>
-                        <td>Jackson</td> 
-                        <td>94</td>
-                    </tr>
-                    </table>
-            </div>
-        </div>`;
-}
-// injectHTML();
+var csvData;
+var inputElements;
+
 getCSVData();
 
 function buttonTapped() {
@@ -32,15 +8,13 @@ function buttonTapped() {
 }
 
 function getCSVData() {
-    console.log('getCSVData');
-
     var xmlhttp = new XMLHttpRequest();
 
     xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
            if (xmlhttp.status == 200) {
-               const responselist = JSON.parse(xmlhttp.responseText);
-               makeHTML(responselist);
+                csvData = JSON.parse(xmlhttp.responseText);
+                getInputElements();
            }
            else if (xmlhttp.status == 400) {
               alert('There was an error 400');
@@ -55,34 +29,96 @@ function getCSVData() {
     xmlhttp.send();
 }
 
-function makeHTML(responselist) {
+function getInputElements() {
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+           if (xmlhttp.status == 200) {
+            console.log('xmlhttp.responseText');
+               inputElements = JSON.parse(xmlhttp.responseText);
+               makeHTML();
+           }
+           else if (xmlhttp.status == 400) {
+              alert('There was an error 400');
+           }
+           else {
+               alert('something else other than 200 was returned', xmlhttp.status);
+           }
+        }
+    };
+
+    xmlhttp.open("GET", "/inputFields", true);
+    xmlhttp.send();
+}
+
+function makeHTML() {
     var injectableHtml = `<!-- The Modal -->
     <div id="myModal" class="modal">
         <!-- Modal content -->
         <div class="modal-content">
             <span class="close" onclick="buttonTapped();">&times;</span>
-            <table id="csvData">`;
+            <table id="csvData">
+                <tr>
+                    <th>Selected Fields</th>
+                    <th>Input Fields</th>
+                    <th>CSV Fields</th>
+                </tr>
+                <tr>
+                `;
     
-    for (var i = 0; i < responselist.length; i++) {
-        const dataList = responselist[i];
+    for (var i = 0; i < inputElements.length; i++) {
+        injectableHtml += `<td><input type="checkbox"/></td>`
+        const inputElementDict = inputElements[i];
+        injectableHtml += `<td>` + inputElementDict['name'] + `</td>`;
         injectableHtml += `
-            <tr>
-        `;
-        for (var j = 0; j < dataList.length; j++) {
-            if(i === 0) {
-                injectableHtml += `<th>` + dataList[j] + `</th>`
-            } else {
-                injectableHtml += `<td>` + dataList[j] + `</td>`
-            }
+            <td>
+                <select>`;
+        for (var j = 0; j < csvData[0].length; j++) {
+            injectableHtml += `<option value="` + csvData[0][j] + `">` + csvData[0][j] +  `</option>`
         }
         injectableHtml += `
-            </tr>
-        `;
+                    </select>
+                </td>
+            </tr>`
     }
-    injectableHtml += `</table>
+    injectableHtml += `
+                </table>
+            </div>
         </div>
-    </div>`;
-    console.log('Data', injectableHtml);
+        `;
+    // console.log('Data', injectableHtml);
     document.body.innerHTML += injectableHtml
 }
+
+// function makeHTML(responselist) {
+//     var injectableHtml = `<!-- The Modal -->
+//     <div id="myModal" class="modal">
+//         <!-- Modal content -->
+//         <div class="modal-content">
+//             <span class="close" onclick="buttonTapped();">&times;</span>
+//             <table id="csvData">`;
+    
+//     for (var i = 0; i < responselist.length; i++) {
+//         const dataList = responselist[i];
+//         injectableHtml += `
+//             <tr>
+//         `;
+//         for (var j = 0; j < dataList.length; j++) {
+//             if(i === 0) {
+//                 injectableHtml += `<th>` + dataList[j] + `</th>`
+//             } else {
+//                 injectableHtml += `<td>` + dataList[j] + `</td>`
+//             }
+//         }
+//         injectableHtml += `
+//             </tr>
+//         `;
+//     }
+//     injectableHtml += `</table>
+//         </div>
+//     </div>`;
+//     console.log('Data', injectableHtml);
+//     document.body.innerHTML += injectableHtml
+// }
 

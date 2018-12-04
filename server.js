@@ -26,11 +26,14 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/readMockData', async (req, res) => {
-    console.log('Get call made!!')
     const dataList = await csvHandler.readData();
-    console.log('DATA', dataList);
     res.send(dataList);
 })
+
+app.get('/inputFields', (req, res) => {
+    const inputFields = webpageGrabber.getInputElements();
+    res.send(inputFields)
+});
 
 function createMockData() {
     var user = {
