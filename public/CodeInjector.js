@@ -1,5 +1,6 @@
 var csvData;
 var inputElements;
+var selectedInputElements = {}
 
 getCSVData();
 
@@ -10,15 +11,25 @@ function buttonTapped() {
 }
 
 function checkboxTapped(checkbox) {
-    console.log('Checkbox tapped with id:', checkbox.id);
+    if(checkbox.checked) {
+        const dropDownList = Array.from(document.getElementsByTagName('select')).filter(value => {
+            return value.id === checkbox.id;
+        });
+        selectedInputElements[checkbox.id] = dropDownList[0].value;
+    }  else {
+        delete selectedInputElements[checkbox.id];
+    }
  }
 
  function dropDownValueSelected(dropDown) {
-    console.log('Selected Value:', dropDown.value);
+    if(selectedInputElements.hasOwnProperty(dropDown.id)) {
+        selectedInputElements[dropDown.id] = dropDown.value;
+    }
  }
 
  function doneButtonTapped(dropDown) {
     console.log('Done Button Tapped');
+    console.log(selectedInputElements);
  }
 
 function getCSVData() {
@@ -87,7 +98,7 @@ function makeHTML() {
         injectableHtml += `<td>` + inputElementDict['name'] + `</td>`;
         injectableHtml += `
             <td>
-                <select onchange="dropDownValueSelected(this);">`;
+                <select onchange="dropDownValueSelected(this);" id="`+ inputElementDict['name'] + `">`;
         for (var j = 0; j < csvData[0].length; j++) {
             injectableHtml += `<option value="` + csvData[0][j] + `">` + csvData[0][j] +  `</option>`
         }
