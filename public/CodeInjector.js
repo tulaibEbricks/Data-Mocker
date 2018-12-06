@@ -1,13 +1,11 @@
 var csvData;
-var inputElements;
-var selectedInputElements = {}
+var inputElementsData;
+var selectedInputElementsDict = {}
 
 getCSVData();
 
 function buttonTapped() {
    console.log('Button tapped');
-   var modal = document.getElementById('myModal');
-   modal.style.display = "none";
 }
 
 function checkboxTapped(checkbox) {
@@ -15,21 +13,31 @@ function checkboxTapped(checkbox) {
         const dropDownList = Array.from(document.getElementsByTagName('select')).filter(value => {
             return value.id === checkbox.id;
         });
-        selectedInputElements[checkbox.id] = dropDownList[0].value;
+        selectedInputElementsDict[checkbox.id] = dropDownList[0].value;
     }  else {
-        delete selectedInputElements[checkbox.id];
+        delete selectedInputElementsDict[checkbox.id];
     }
  }
 
  function dropDownValueSelected(dropDown) {
-    if(selectedInputElements.hasOwnProperty(dropDown.id)) {
-        selectedInputElements[dropDown.id] = dropDown.value;
+    if(selectedInputElementsDict.hasOwnProperty(dropDown.id)) {
+        selectedInputElementsDict[dropDown.id] = dropDown.value;
     }
  }
 
- function doneButtonTapped(dropDown) {
+ function doneButtonTapped() {
     console.log('Done Button Tapped');
-    console.log(selectedInputElements);
+    console.log(selectedInputElementsDict);
+    var modal = document.getElementById('myModal');
+    modal.style.display = "none";
+    var inputElements = Array.from(document.getElementsByTagName('input'));
+    for (var key in selectedInputElementsDict) {
+       var selectedElements = inputElements.filter(inputElement => {
+            return inputElement.name === key;
+       });
+       const indexOfName = csvData[0].indexOf(selectedInputElementsDict[key])
+       selectedElements[0].value = csvData[1][indexOfName];
+      }
  }
 
 function getCSVData() {
@@ -60,7 +68,7 @@ function getInputElements() {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE) {
            if (xmlhttp.status == 200) {
-               inputElements = JSON.parse(xmlhttp.responseText);
+            inputElementsData = JSON.parse(xmlhttp.responseText);
                makeHTML();
            }
            else if (xmlhttp.status == 400) {
@@ -92,8 +100,8 @@ function makeHTML() {
                 <tr>
                 `;
     
-    for (var i = 0; i < inputElements.length; i++) {
-        const inputElementDict = inputElements[i];
+    for (var i = 0; i < inputElementsData.length; i++) {
+        const inputElementDict = inputElementsData[i];
         injectableHtml += `<td><input type="checkbox" id="`+ inputElementDict['name'] + `" onchange="checkboxTapped(this);"/></td>`
         injectableHtml += `<td>` + inputElementDict['name'] + `</td>`;
         injectableHtml += `
